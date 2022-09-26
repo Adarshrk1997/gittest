@@ -10,12 +10,17 @@
       yum:
         name: httpd
         state: present
-            
+
+    - name: "installing php support"
+      yum:
+        name: php
+        state: present
+
     - name: "Creating httpd.conf from httpd.conf.tmpl"
       template:
         src: httpd.conf.tmpl
         dest: /etc/httpd/conf/httpd.conf
-        
+      
     - name: "Creating VirtualHost from virtualhost.conf.tmpl"
       template:
         src: virtualhost.conf.tmpl
@@ -23,6 +28,21 @@
         owner: "{{ httpd_owner }}"
         group: "{{ httpd_group }}"
     
+    
+    - name: "Creating DocumentRoot /var/www/html/{{httpd_hostname}}"
+      file:
+        path: "/var/www/html/{{httpd_hostname}}"
+        state: directory    
+        owner: "{{ httpd_owner }}"
+        group: "{{ httpd_group }}"
+    
+    - name: "Creating Test Files Inside Documents Root"
+      copy:
+        src: test.html
+        dest: "/var/www/html/{{httpd_hostname}}"
+        owner: "{{ httpd_owner }}"
+        group: "{{ httpd_group }}"
+            
     - name: "ReStarting/Enabling Service"
       service:
         name: httpd
